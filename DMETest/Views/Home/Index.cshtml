@@ -1,0 +1,143 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+    AjaxOptions ajaxOptions = new AjaxOptions
+    {
+        UpdateTargetId = "tableBody",
+        Url = Url.Action("GetUserList")
+    };
+}
+
+<div class="row">
+    <table class="table" style="margin-bottom: 0px;">
+        <tbody>
+            <tr>
+                <th scope="row" style="width:5%;"></th>
+                <th scope="col"><input type="text" id="searchData"/></th>
+                <th scope="col"><button class="btn" onclick="findByName();">Find</button></th>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="row">
+    <table class="table table-dark" id="tableBody">
+        <thead>
+            <tr>
+                <th scope="row" style="width:5%"></th>
+                <th scope="col"><a href="#" id="name" onclick="sortingBy(this)">Фамилия Имя</a><div class="sortIcon"></div></th>
+                <th scope="col"><a href="#" id="birth" onclick="sortingBy(this)">дата рождения</a><div class="sortIcon"></div></th>
+            </tr>
+        </thead>
+        <tbody id="tbody1">
+            @Html.Action("GetUserList", "Home", new { sortBy = "name" })
+        </tbody>
+    </table>
+    <div class="row" style="text-align:center">
+        <ul class="pagination">
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="prevPage();">Previous</a>
+            </li>
+            <li class="page-item active"><a class="page-link" href="#" onclick="prevPage()">1</a></li>
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="nextPage()">2</a>
+            </li>
+            <li class="page-item"><a class="page-link" href="#" onclick="nextPage()">3</a></li>
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="nextPage()">Next</a>
+            </li>
+        </ul>
+    </div>  
+</div>
+
+<script>
+
+    let _sortingId = "name";
+    let _isDesc = false;
+    let _fname = null;
+
+    function nextPage() {
+        let curPage = parseInt($('ul li.active a').text(), 10);
+
+        if ($('ul li.active').children().text() == 1) {
+            $('ul li.active').removeClass('active');
+            $('ul li a:contains("2")').parent().addClass('active');
+            $('ul li').first().removeClass('disabled');
+            updateData(curPage + 1);
+        }
+        else {
+            $('ul li.active').children().text(curPage + 1);
+            $('ul li').last().prev().children().text(curPage + 2);
+            $('ul li').first().next().children().text(curPage);
+            updateData(curPage + 1);
+        }
+    };
+
+    function prevPage() {
+        let curPage = parseInt($('ul li.active a').text(), 10);
+        if (curPage > 2) {
+            $('ul li.active').children().text(curPage - 1);
+            $('ul li').last().prev().children().text(curPage);
+            $('ul li').first().next().children().text(curPage - 2);
+            updateData(curPage - 1);
+        }
+        if (curPage == 2 && $('ul li.active').children().text() != 1) {
+            $('ul li.active').removeClass('active');
+            $('ul li a:contains("1")').parent().addClass('active');
+            $('ul li').first().addClass('disabled');
+            updateData(curPage - 1);
+        }
+        
+    }
+
+ 
+
+    function sortingBy(e) {
+        let sortedBy = $(e).attr("id");
+        if (_sortingId == sortedBy && _isDesc == false) {
+            _isDesc = true;
+           
+        } else if (_sortingId == sortedBy && _isDesc == true) {
+            _isDesc = false;
+        }
+        _sortingId = sortedBy;
+        if (_isDesc) {
+            $('div.sortIcon').removeClass('glyphicon glyphicon-sort-by-attributes-alt');
+            $('div.sortIcon').removeClass('glyphicon glyphicon-sort-by-attributes');
+            $(e).parent().children().last().removeClass('glyphicon glyphicon-sort-by-attributes');
+            $(e).parent().children().last().addClass('glyphicon glyphicon-sort-by-attributes-alt');
+        } else if (!_isDesc) {
+            $('div.sortIcon').removeClass('glyphicon glyphicon-sort-by-attributes-alt');
+            $('div.sortIcon').removeClass('glyphicon glyphicon-sort-by-attributes');
+            $(e).parent().children().last().removeClass('glyphicon glyphicon-sort-by-attributes-alt');
+            $(e).parent().children().last().addClass('glyphicon glyphicon-sort-by-attributes');
+        }
+        let curPage = parseInt($('ul li.active a').text(), 10);
+        updateData(curPage, sortedBy, _isDesc);
+    }
+
+    function findByName() {
+        let searchData = $('#searchData').val() == "" ? null : $('#searchData').val();
+        let curPage = parseInt($('ul li.active a').text(), 10);
+        _fname = searchData;
+        updateData(curPage, _sortingId, _isDesc, searchData);
+    }
+
+    function updateData(pageNum, sortBy, isDesc, fname) {
+        if (sortBy === undefined) {
+            sortBy = _sortingId;
+        }
+        if (isDesc === undefined) {
+            isDesc = _isDesc;
+        }
+        if (fname === undefined) {
+            fname = _fname;
+        }
+        $.ajax(
+            {
+                type: "POST",
+                url: '',
+                success: function () {
+                    $("#tbody1").load("@Url.Action("GetUserList", "Home")?pageNum=" + pageNum + "&sortBy=" + sortBy + "&isDesc=" + isDesc + "&fName=" + fname);
+                }
+            })
+    };
+</script>

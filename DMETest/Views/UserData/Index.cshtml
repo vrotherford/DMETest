@@ -1,0 +1,60 @@
+﻿@model DMETest.Models.UserModel
+@{
+    ViewBag.Title = "Index";
+}
+<div class="row">
+    @Html.ActionLink("Back", "Index", "Home", null, new { @class = "btn btn-secondary btn-lg active", style = "margin-top:3%"})
+</div>
+<div class="row" style="width:50%; margin-top:20px;">
+    <div class="col-sm-3">
+        <a href="#" onclick="fullscreen()"><img src='@Url.Content(Model.mediumPhoto)' class="rounded float-right" style="margin-top: 60%;"></a>
+    </div>
+    <div class="col-sm-5">
+        <table class="table table-dark" id="tableBody">
+            <thead>
+                <tr>
+                    <th scope="row"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Name:</td>
+                    <td>@Model.firstName @Model.lastName</ td >
+                </tr>
+                <tr>
+                    <td>email:</td>
+                    <td>@Model.email</td>
+                </tr>
+                <tr>
+                    <td>phone:</td>
+                    <td>@Model.phone</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="fsImage" hidden="hidden" onclick="closePhoto()">
+    <img src='@Url.Content(Model.largePhoto)' style="margin: auto;" />
+</div>
+
+<script>
+    function fullscreen() {
+        $('div.fsImage').attr('hidden', false)
+    }
+    function closePhoto() {
+        $('div.fsImage').attr('hidden', true)
+    }
+</script>
+<style>
+    .fsImage {
+        position: absolute;
+        top: 0;
+        left: 0;
+        padding: 20%;
+        height: 100%;
+        width: 100%;
+        background: rgba(0,0,0,0.5);
+        text-align: center;
+    }
+</style>
+

@@ -1,0 +1,37 @@
+﻿@using Core
+@model IEnumerable<User>
+@helper authLink(User user) { 
+if (User.Identity.IsAuthenticated)
+{
+    @Html.ActionLink(user.lastName + " " + user.firstName, "Index", "UserData", new {uid = user.id }, null)
+}
+else
+{
+     @user.lastName <a> </a>  @user.firstName
+    }
+    }
+    @foreach (User user in Model)
+    {
+        <tr>
+            <th scope="row"> <img src='@Url.Content(user.thumbnail)' style="border-radius: 50%;" /></th>
+            <td>@authLink(user)</td>
+            <td>@user.birth.ToShortDateString()</td>
+        </tr>
+    }
+
+<script>
+    $(document).ready(function checkPage() {
+        if ($('#tbody1 tr').length != 10) {
+            $('ul li').last().prev().addClass('disabled');
+            $('ul li').last().addClass('disabled');
+            if (!$('ul li a:contains("2")').parent().hasClass('active')) {
+                $('ul li a:contains("2")').parent().addClass('disabled');
+            }
+
+        } else {
+            $('ul li').last().prev().removeClass('disabled');
+            $('ul li').last().removeClass('disabled');
+            $('ul li a:contains("2")').parent().removeClass('disabled');
+        }
+    });
+</script>
